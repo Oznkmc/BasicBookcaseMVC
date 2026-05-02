@@ -1,0 +1,231 @@
+﻿@{
+    ViewData["Title"] = "Kitap Ekle";
+}
+@model BooksInfo
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+    /* CSS kodların aynen kalıyor (Toast CSS'lerini sildim) */
+    .add-page {
+        font-family: 'Outfit', sans-serif;
+        max-width: 540px;
+        margin: 0 auto;
+        padding: 2rem 1rem 4rem;
+    }
+
+    .back-link {
+        display: inline-flex; align-items: center; gap: 0.35rem;
+        font-size: 0.82rem; color: var(--amber-dark);
+        text-decoration: none; font-weight: 400;
+        margin-bottom: 1.75rem; transition: color 0.18s;
+    }
+    .back-link:hover { color: var(--leather); }
+
+    .page-eyebrow {
+        font-size: 0.7rem; font-weight: 600;
+        letter-spacing: 0.2em; text-transform: uppercase;
+        color: var(--warm-tan); margin-bottom: 0.4rem;
+    }
+    .page-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 2.2rem; font-weight: 600;
+        color: var(--ink); line-height: 1.1; margin: 0 0 0.35rem;
+    }
+    .page-title em { font-style: italic; color: var(--gold-accent); }
+    .page-sub {
+        font-size: 0.86rem; color: var(--amber-dark);
+        font-weight: 300; margin: 0 0 2rem;
+    }
+
+    .form-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-subtle);
+        border-radius: 20px; overflow: hidden;
+        box-shadow: 0 4px 24px rgba(28, 20, 16, 0.06);
+    }
+    .spine-bar {
+        height: 6px; width: 100%;
+        background: #5DCAA5; transition: background 0.35s ease;
+    }
+    .form-body { padding: 2rem 2rem 1.25rem; }
+
+    .field { margin-bottom: 1.4rem; }
+    .field label {
+        display: block; font-size: 0.78rem; font-weight: 500;
+        letter-spacing: 0.06em; text-transform: uppercase;
+        color: var(--amber-dark); margin-bottom: 0.45rem;
+    }
+    .field input {
+        width: 100%; padding: 0.65rem 0.9rem;
+        font-size: 0.92rem; font-family: 'Outfit', sans-serif;
+        color: var(--ink); background: var(--cream);
+        border: 1px solid var(--border-mid); border-radius: 10px;
+        outline: none; transition: border-color 0.18s, box-shadow 0.18s;
+    }
+    .field input::placeholder { color: #b09070; }
+    .field input:focus {
+        border-color: var(--amber-dark);
+        box-shadow: 0 0 0 3px rgba(139, 100, 48, 0.1);
+        background: #fdf8f0;
+    }
+    .field-hint { font-size: 0.75rem; color: var(--warm-tan); margin-top: 0.35rem; font-weight: 300; }
+    .val-error { font-size: 0.75rem; color: #c0392b; margin-top: 0.35rem; display: block; }
+
+    .thick-badge {
+        display: none; margin-top: 0.55rem;
+        font-size: 0.72rem; font-weight: 600;
+        padding: 0.3rem 0.75rem; border-radius: 20px;
+        background: #f5d98a; color: #7a4a10;
+        width: fit-content; letter-spacing: 0.03em;
+    }
+
+    .form-divider { height: 1px; background: var(--border-subtle); margin: 0.25rem 0 1.5rem; }
+
+    .preview-label {
+        font-size: 0.68rem; font-weight: 600;
+        letter-spacing: 0.1em; text-transform: uppercase;
+        color: var(--warm-tan); margin-bottom: 0.5rem;
+    }
+    .book-preview {
+        background: var(--cream); border: 1px solid var(--border-subtle);
+        border-radius: 12px; padding: 0.9rem 1.1rem;
+        display: flex; align-items: center; gap: 0.85rem;
+        margin-bottom: 0;
+    }
+    .preview-dot {
+        width: 32px; height: 32px; border-radius: 8px;
+        background: #5DCAA5; flex-shrink: 0;
+        transition: background 0.35s ease; opacity: 0.85;
+    }
+    .preview-text-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1rem; font-weight: 600;
+        color: var(--ink); line-height: 1.2;
+    }
+    .preview-text-sub {
+        font-size: 0.75rem; color: var(--amber-dark);
+        font-weight: 300; margin-top: 0.1rem;
+    }
+
+    .form-actions {
+        display: flex; gap: 0.6rem;
+        padding: 1.25rem 2rem 1.75rem;
+        border-top: 1px solid var(--border-subtle);
+    }
+    .btn-submit {
+        flex: 1; display: flex; align-items: center;
+        justify-content: center; gap: 0.4rem;
+        padding: 0.7rem; font-size: 0.9rem; font-weight: 600;
+        font-family: 'Outfit', sans-serif;
+        background: var(--gold-accent); color: var(--ink);
+        border: none; border-radius: 11px; cursor: pointer;
+        transition: background 0.2s, transform 0.15s;
+    }
+    .btn-submit:hover { background: #d4a93e; transform: translateY(-1px); }
+    .btn-cancel {
+        display: flex; align-items: center; justify-content: center;
+        padding: 0.7rem 1.2rem; font-size: 0.88rem; font-weight: 400;
+        font-family: 'Outfit', sans-serif;
+        background: var(--parchment); color: #6d5540;
+        border: 1px solid var(--border-mid); border-radius: 11px;
+        text-decoration: none; transition: background 0.18s;
+    }
+    .btn-cancel:hover { background: #e0d4ba; color: var(--ink); }
+</style>
+
+<div class="add-page">
+    <a class="back-link" asp-action="Books">
+        <i class="bi bi-arrow-left"></i> Kitaplığa Dön
+    </a>
+
+    <div class="page-eyebrow">Koleksiyon</div>
+    <h1 class="page-title">Yeni Kitap <em>Ekle</em></h1>
+    <p class="page-sub">Koleksiyonuna yeni bir eser ekle</p>
+
+    <div class="form-card">
+        <div class="spine-bar" id="spineBar"></div>
+
+        <form asp-action="Add" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="form-body">
+                <div class="field">
+                    <label asp-for="BookName">Kitap Adı</label>
+                    <input asp-for="BookName" id="bookNameInput" placeholder="ör. Suç ve Ceza" autocomplete="off" />
+                    <span asp-validation-for="BookName" class="val-error"></span>
+                </div>
+
+                <div class="field">
+                    <label asp-for="Author">Yazar</label>
+                    <input asp-for="Author" id="authorInput" placeholder="ör. Fyodor Dostoyevski" autocomplete="off" />
+                    <span asp-validation-for="Author" class="val-error"></span>
+                </div>
+
+                <div class="field">
+                    <label asp-for="BookPages">Sayfa Sayısı</label>
+                    <input asp-for="BookPages" id="pagesInput" type="number" min="1" placeholder="ör. 671" />
+                    <p class="field-hint">500 sayfanın üzerindeyse "Kalın Kitap" rozeti alır.</p>
+                    <div class="thick-badge" id="thickBadge">★ Kalın Kitap</div>
+                    <span asp-validation-for="BookPages" class="val-error"></span>
+                </div>
+
+                <div class="form-divider"></div>
+
+                <div class="preview-label">Kart Önizlemesi</div>
+                <div class="book-preview">
+                    <div class="preview-dot" id="previewDot"></div>
+                    <div>
+                        <div class="preview-text-title" id="previewTitle">Kitap adı...</div>
+                        <div class="preview-text-sub" id="previewAuthor">Yazar adı...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a asp-action="Books" class="btn-cancel">
+                    <i class="bi bi-x-lg me-1"></i> İptal
+                </a>
+                <button type="submit" class="btn-submit">
+                    <i class="bi bi-plus-lg"></i> Kitabı Ekle
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        // ── Sadece Form Önizleme (Preview) Scriptleri Kaldı ─────────────────
+        const colors      = ["#5DCAA5","#378ADD","#D4537E","#7F77DD","#D85A30","#C89A3A"];
+        const nameInput   = document.getElementById('bookNameInput');
+        const authorInput = document.getElementById('authorInput');
+        const pagesInput  = document.getElementById('pagesInput');
+        const thickBadge  = document.getElementById('thickBadge');
+        const spineBar    = document.getElementById('spineBar');
+        const previewDot  = document.getElementById('previewDot');
+        const previewTitle  = document.getElementById('previewTitle');
+        const previewAuthor = document.getElementById('previewAuthor');
+
+        function getColor(str) {
+            return colors[str.length % colors.length];
+        }
+
+        nameInput.addEventListener('input', () => {
+            const c = getColor(nameInput.value);
+            spineBar.style.background = c;
+            previewDot.style.background = c;
+            previewTitle.textContent = nameInput.value || 'Kitap adı...';
+        });
+
+        authorInput.addEventListener('input', () => {
+            previewAuthor.textContent = authorInput.value || 'Yazar adı...';
+        });
+
+        pagesInput.addEventListener('input', () => {
+            thickBadge.style.display = parseInt(pagesInput.value) > 500 ? 'block' : 'none';
+        });
+    </script>
+}

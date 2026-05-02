@@ -1,0 +1,94 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+
+@model BooksInfo
+@{
+    ViewData["Title"] = "Kitabı Düzenle";
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+
+<style>
+    /* Add sayfasındaki stillerin birebir aynısı */
+    .form-root { font-family: 'DM Sans', sans-serif; padding: 2rem 1rem; max-width: 520px; margin: 0 auto; }
+    .form-title { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 600; margin-bottom: 0.25rem; }
+    .form-sub { font-size: 13px; color: #888; margin-bottom: 2rem; }
+    .form-back { font-size: 13px; color: #888; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 1.5rem; }
+    .form-back:hover { color: #222; }
+    .form-card { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 1.75rem; }
+    .spine-preview { height: 5px; border-radius: 3px; margin-bottom: 1.75rem; background: #5DCAA5; transition: background 0.3s; }
+    .field { margin-bottom: 1.25rem; }
+    .field label { display: block; font-size: 13px; font-weight: 500; color: #666; margin-bottom: 6px; }
+    .field input { width: 100%; box-sizing: border-box; padding: 9px 12px; font-size: 14px; font-family: 'DM Sans', sans-serif; background: #f9f9f9; border: 1px solid #e5e5e5; border-radius: 8px; outline: none; transition: border-color 0.15s; }
+    .field input:focus { border-color: #aaa; }
+    .badge-thick { margin-top: 8px; font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; background: #FAC775; color: #633806; width: fit-content; }
+    .val-error { font-size: 11px; color: #E24B4A; margin-top: 4px; }
+    .form-actions { display: flex; gap: 10px; margin-top: 1.75rem; }
+    .btn-primary { flex: 1; padding: 10px; font-size: 14px; font-weight: 500; background: #222; color: #fff; border: none; border-radius: 8px; cursor: pointer; }
+    .btn-secondary { padding: 10px 16px; font-size: 14px; font-weight: 500; background: transparent; color: #666; border: 1px solid #e5e5e5; border-radius: 8px; text-decoration: none; text-align: center; }
+</style>
+
+<div class="form-root container">
+    <a class="form-back" asp-action="Books">&#8592; Kitaplığa Dön</a>
+    <h2 class="form-title">Kitabı Düzenle</h2>
+    <p class="form-sub">"@Model.BookName" bilgilerini güncelle</p>
+
+    <div class="form-card">
+        <div class="spine-preview" id="spinePreview"></div>
+
+        <form asp-action="Duzenle" method="post">
+            <!-- KRİTİK: Gizli ID alanı. Bu olmazsa SQL kimi güncelleyeceğini bulamaz! -->
+            <input type="hidden" asp-for="Id" />
+
+            <div class="field">
+                <label asp-for="BookName">Kitap Adı</label>
+                <input asp-for="BookName" id="bookNameInput" />
+                <span asp-validation-for="BookName" class="val-error"></span>
+            </div>
+
+            <div class="field">
+                <label asp-for="Author">Yazar</label>
+                <input asp-for="Author" />
+                <span asp-validation-for="Author" class="val-error"></span>
+            </div>
+
+            <div class="field">
+                <label asp-for="BookPages">Sayfa Sayısı</label>
+                <input asp-for="BookPages" id="pagesInput" type="number" />
+                <div class="badge-thick" id="thickBadge" style="display: @(Model.BookPages > 500 ? "block" : "none")">Kalın Kitap</div>
+                <span asp-validation-for="BookPages" class="val-error"></span>
+            </div>
+
+            <div class="form-actions">
+                <a asp-action="Books" class="btn-secondary">İptal</a>
+                <button type="submit" class="btn-primary">Değişiklikleri Kaydet</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        const colors = ["#5DCAA5","#378ADD","#D4537E","#7F77DD","#D85A30","#639922"];
+        const nameInput = document.getElementById('bookNameInput');
+        const pagesInput = document.getElementById('pagesInput');
+        const badge = document.getElementById('thickBadge');
+        const spine = document.getElementById('spinePreview');
+
+        // İlk açılışta rengi ayarla
+        spine.style.background = colors[nameInput.value.length % colors.length];
+
+        nameInput.addEventListener('input', () => {
+            spine.style.background = colors[nameInput.value.length % colors.length];
+        });
+
+        pagesInput.addEventListener('input', () => {
+            badge.style.display = parseInt(pagesInput.value) > 500 ? 'block' : 'none';
+        });
+    </script>
+}

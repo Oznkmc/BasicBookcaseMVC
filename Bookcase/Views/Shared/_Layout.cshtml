@@ -1,0 +1,285 @@
+﻿@using System.Text.Encodings.Web
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Bookcase</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --cream: #F5EFE0;
+            --parchment: #EDE3CF;
+            --warm-tan: #C8AA7E;
+            --amber-dark: #8B6430;
+            --leather: #5C3D1E;
+            --ink: #1C1410;
+            --card-bg: #FDFAF4;
+            --border-subtle: rgba(139, 100, 48, 0.15);
+            --border-mid: rgba(139, 100, 48, 0.28);
+            --gold-accent: #C89A3A;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--cream);
+            color: var(--ink);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── NAVBAR ── */
+        .site-nav {
+            background: rgba(253, 250, 244, 0.92);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 0.6rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: box-shadow 0.3s;
+        }
+        .site-nav.scrolled { box-shadow: 0 4px 24px rgba(28, 20, 16, 0.08); }
+
+        .nav-brand {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.55rem;
+            font-weight: 700;
+            color: var(--leather) !important;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            letter-spacing: -0.01em;
+            transition: color 0.2s;
+        }
+        .nav-brand:hover { color: var(--amber-dark) !important; }
+        .nav-brand i { color: var(--gold-accent); font-size: 1.25rem; }
+
+        .nav-link-item {
+            font-size: 0.88rem;
+            font-weight: 400;
+            color: #6d5540 !important;
+            text-decoration: none;
+            padding: 0.4rem 0.75rem;
+            border-radius: 8px;
+            transition: background 0.18s, color 0.18s;
+            letter-spacing: 0.01em;
+        }
+        .nav-link-item:hover { color: var(--ink) !important; background: var(--parchment); }
+        .nav-link-item.active { color: var(--leather) !important; font-weight: 500; background: var(--parchment); }
+
+        .btn-nav-add {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: var(--gold-accent);
+            color: var(--ink) !important;
+            border: none;
+            border-radius: 10px;
+            padding: 0.45rem 1.1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background 0.2s, transform 0.15s;
+        }
+        .btn-nav-add:hover { background: #d4a93e; transform: translateY(-1px); color: var(--ink) !important; }
+
+        .navbar-toggler { border: 1px solid var(--border-mid); border-radius: 8px; padding: 0.3rem 0.5rem; }
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(92,61,30,0.85)' stroke-width='2' stroke-linecap='round' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        /* ── MAIN ── */
+        .site-main { flex: 1; padding-bottom: 3rem; }
+
+        /* ── FOOTER ── */
+        .site-footer { background: var(--card-bg); border-top: 1px solid var(--border-subtle); padding: 2.25rem 0; margin-top: auto; }
+        .footer-brand { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 600; color: var(--leather); }
+        .footer-copy { font-size: 0.82rem; color: var(--amber-dark); font-weight: 300; margin-top: 0.3rem; }
+        .footer-copy i { font-size: 0.75rem; }
+        .footer-ornament { color: var(--warm-tan); letter-spacing: 0.4em; font-size: 0.65rem; opacity: 0.5; margin-bottom: 0.9rem; user-select: none; }
+
+        /* ── TOAST ── */
+        .toast-wrap {
+            position: fixed; bottom: 2rem; left: 50%;
+            transform: translateX(-50%) translateY(120%);
+            z-index: 9999; pointer-events: none;
+            transition: transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+            opacity: 0;
+        }
+        .toast-wrap.show { transform: translateX(-50%) translateY(0); opacity: 1; pointer-events: auto; }
+        .toast-wrap.hide { transform: translateX(-50%) translateY(120%); opacity: 0; }
+        .toast-box {
+            display: flex; align-items: center; gap: 0.75rem;
+            background: #1C1410;
+            border: 1px solid rgba(200, 154, 58, 0.35);
+            border-radius: 16px;
+            padding: 0.85rem 1.25rem 0.85rem 1rem;
+            box-shadow: 0 8px 32px rgba(28,20,16,0.22);
+            min-width: 260px; max-width: 360px;
+            position: relative; overflow: hidden;
+            transition: border-color 0.2s;
+        }
+        .toast-wrap.error .toast-box { border-color: rgba(212, 83, 126, 0.45); }
+        .toast-icon {
+            width: 34px; height: 34px; border-radius: 50%; background: #5DCAA5;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; font-size: 1rem; color: #fff; font-weight: 700;
+            transition: background 0.2s;
+        }
+        .toast-wrap.error .toast-icon { background: #D4537E; }
+        .toast-texts { flex: 1; min-width: 0; }
+        .toast-title { font-size: 0.88rem; font-weight: 600; color: #F5EFE0; line-height: 1.2; margin-bottom: 0.15rem; }
+        .toast-body { font-size: 0.78rem; color: #C8AA7E; font-weight: 300; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .toast-close { background: none; border: none; cursor: pointer; color: #8B6430; font-size: 0.85rem; padding: 0.2rem; transition: color 0.18s; flex-shrink: 0; }
+        .toast-close:hover { color: #F5EFE0; }
+        .toast-progress {
+            position: absolute; bottom: 0; left: 0; height: 3px;
+            border-radius: 0 0 16px 16px; background: #5DCAA5; width: 100%;
+            transform-origin: left; transition: background 0.2s;
+        }
+        .toast-wrap.error .toast-progress { background: #D4537E; }
+        @@keyframes toastShrink { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav class="site-nav navbar navbar-expand-sm">
+            <div class="container">
+                <a class="nav-brand navbar-brand" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-bookmark-star-fill"></i>Bookcase
+                </a>
+                <button class="navbar-toggler" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#navbarContent"
+                        aria-controls="navbarContent" aria-expanded="false" aria-label="Menüyü aç">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-between align-items-center" id="navbarContent">
+                    <ul class="navbar-nav gap-1">
+                        <li class="nav-item">
+                            <a class="nav-link-item" asp-controller="Home" asp-action="Index">Ana Sayfa</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link-item" asp-controller="Home" asp-action="Books">Kitaplık</a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav mt-2 mt-sm-0">
+                        <li class="nav-item">
+                            <a class="btn-nav-add" asp-controller="Home" asp-action="Add">
+                                <i class="bi bi-plus-lg"></i> Yeni Kitap Ekle
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container site-main pt-4">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="site-footer">
+        <div class="container text-center">
+            <div class="footer-ornament">— ✦ —</div>
+            <div class="footer-brand">Bookcase</div>
+            <p class="footer-copy">
+                &copy; 2026 · Ozan Kömcü tarafından <i class="bi bi-heart-fill text-danger"></i> ile geliştirildi.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Toast -->
+    <div class="toast-wrap" id="successToast" role="alert" aria-live="polite">
+        <div class="toast-box">
+            <div class="toast-icon" id="toastIcon">✓</div>
+            <div class="toast-texts">
+                <div class="toast-title" id="toastTitle">İşlem Başarılı!</div>
+                <div id="toastBody" class="toast-body">Koleksiyonuna başarıyla eklendi.</div>
+            </div>
+            <button class="toast-close" onclick="hideToast()" aria-label="Kapat">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            <div class="toast-progress" id="toastProgress"></div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        const nav = document.querySelector('.site-nav');
+        window.addEventListener('scroll', () => {
+            nav.classList.toggle('scrolled', window.scrollY > 10);
+        });
+
+        let toastTimer;
+        function showToast(message, type = 'success') {
+            const wrap  = document.getElementById('successToast');
+            const body  = document.getElementById('toastBody');
+            const prog  = document.getElementById('toastProgress');
+            const title = document.getElementById('toastTitle');
+            const icon  = document.getElementById('toastIcon');
+
+            if (message) body.textContent = message;
+
+            wrap.classList.remove('error');
+            if (type === 'error') {
+                wrap.classList.add('error');
+                title.textContent = 'Zaten Mevcut!';
+                icon.textContent  = '✕';
+            } else {
+                title.textContent = 'İşlem Başarılı!';
+                icon.textContent  = '✓';
+            }
+
+            wrap.classList.remove('hide');
+            wrap.classList.add('show');
+
+            prog.style.animation = 'none';
+            void prog.offsetWidth;
+            prog.style.animation = 'toastShrink 4s linear forwards';
+
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(hideToast, 4000);
+        }
+
+        function hideToast() {
+            const wrap = document.getElementById('successToast');
+            wrap.classList.add('hide');
+            setTimeout(() => wrap.classList.remove('show', 'hide'), 420);
+        }
+
+        @if (TempData["Success"] != null)
+        {
+            <text>
+            document.addEventListener('DOMContentLoaded', function () {
+                showToast("@JavaScriptEncoder.Default.Encode(TempData["Success"].ToString())");
+            });
+            </text>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <text>
+            document.addEventListener('DOMContentLoaded', function () {
+                showToast("@JavaScriptEncoder.Default.Encode(TempData["Error"].ToString())", 'error');
+            });
+            </text>
+        }
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

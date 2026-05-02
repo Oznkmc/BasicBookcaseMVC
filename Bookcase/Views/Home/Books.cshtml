@@ -1,0 +1,326 @@
+﻿@model List<Bookcase.Models.BooksInfo>
+@{
+    ViewData["Title"] = "Kitaplık";
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+    :root {
+        --cream: #F5EFE0;
+        --parchment: #EDE3CF;
+        --warm-tan: #C8AA7E;
+        --amber-dark: #8B6430;
+        --leather: #5C3D1E;
+        --ink: #1C1410;
+        --ink-soft: #3D2B1A;
+        --spine-shadow: rgba(28, 20, 16, 0.18);
+        --card-bg: #FDFAF4;
+        --border-subtle: rgba(139, 100, 48, 0.15);
+        --border-mid: rgba(139, 100, 48, 0.28);
+        --gold-accent: #C89A3A;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    .lib-page {
+        font-family: 'Outfit', sans-serif;
+        background: var(--cream);
+        min-height: 100vh;
+        padding: 2rem 0 4rem;
+    }
+
+    .hero-band {
+        background: var(--leather);
+        border-radius: 20px;
+        padding: 3rem 3.5rem;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 2.5rem;
+    }
+    .hero-band::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+            repeating-linear-gradient(90deg, transparent 0px, transparent 48px, rgba(255,255,255,0.025) 48px, rgba(255,255,255,0.025) 50px),
+            repeating-linear-gradient(0deg, transparent 0px, transparent 48px, rgba(255,255,255,0.025) 48px, rgba(255,255,255,0.025) 50px);
+        pointer-events: none;
+    }
+    .hero-band::after {
+        content: '';
+        position: absolute;
+        right: -60px; top: -60px;
+        width: 300px; height: 300px;
+        border-radius: 50%;
+        border: 40px solid rgba(200, 154, 58, 0.12);
+        pointer-events: none;
+    }
+    .hero-inner { position: relative; z-index: 1; }
+    .hero-eyebrow {
+        font-size: 0.7rem; font-weight: 600;
+        letter-spacing: 0.22em; text-transform: uppercase;
+        color: var(--warm-tan); margin-bottom: 0.75rem;
+    }
+    .hero-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: clamp(2.4rem, 5vw, 4rem);
+        font-weight: 600; color: var(--parchment);
+        line-height: 1.05; margin: 0 0 0.9rem;
+    }
+    .hero-title em { font-style: italic; color: var(--gold-accent); }
+    .hero-desc {
+        color: rgba(237, 227, 207, 0.72);
+        font-size: 0.97rem; font-weight: 300;
+        max-width: 52rem; line-height: 1.65; margin-bottom: 2rem;
+    }
+    .stat-row { display: flex; gap: 0.875rem; flex-wrap: wrap; }
+    .stat-pill {
+        background: rgba(255,255,255,0.07);
+        border: 1px solid rgba(200, 154, 58, 0.28);
+        border-radius: 12px; padding: 0.8rem 1.25rem; min-width: 130px;
+    }
+    .stat-pill strong {
+        display: block;
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.6rem; font-weight: 700;
+        color: var(--gold-accent); line-height: 1;
+    }
+    .stat-pill span { font-size: 0.78rem; color: rgba(237, 227, 207, 0.62); font-weight: 300; }
+
+    .toolbar {
+        display: flex; align-items: center;
+        justify-content: space-between;
+        gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem;
+    }
+    .toolbar-left h2 {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.8rem; font-weight: 600;
+        color: var(--ink); margin: 0 0 0.15rem;
+    }
+    .toolbar-left p { font-size: 0.85rem; color: var(--amber-dark); margin: 0; }
+    .toolbar-right { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+
+    .search-wrap {
+        display: flex; align-items: center;
+        background: var(--card-bg);
+        border: 1px solid var(--border-mid);
+        border-radius: 12px; overflow: hidden;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .search-wrap:focus-within {
+        border-color: var(--amber-dark);
+        box-shadow: 0 0 0 3px rgba(139, 100, 48, 0.1);
+    }
+    .search-wrap input {
+        border: none !important; background: transparent;
+        padding: 0.55rem 1rem; font-family: 'Outfit', sans-serif;
+        font-size: 0.88rem; color: var(--ink);
+        width: 220px; outline: none; box-shadow: none !important;
+    }
+    .search-wrap input::placeholder { color: #9a8570; }
+    .search-wrap button {
+        background: var(--leather); border: none;
+        color: var(--parchment); padding: 0.55rem 1rem;
+        font-size: 0.82rem; cursor: pointer;
+        transition: background 0.2s; font-family: 'Outfit', sans-serif;
+    }
+    .search-wrap button:hover { background: var(--ink); }
+
+    .btn-add {
+        display: inline-flex; align-items: center; gap: 0.4rem;
+        background: var(--gold-accent); color: var(--ink);
+        border: none; border-radius: 12px; padding: 0.58rem 1.25rem;
+        font-family: 'Outfit', sans-serif; font-size: 0.88rem;
+        font-weight: 600; text-decoration: none;
+        transition: background 0.2s, transform 0.15s;
+    }
+    .btn-add:hover { background: #d4a93e; transform: translateY(-1px); color: var(--ink); }
+
+    .btn-clear {
+        font-size: 0.82rem; color: var(--amber-dark);
+        text-decoration: none; border: 1px solid var(--border-mid);
+        border-radius: 10px; padding: 0.5rem 0.9rem;
+        font-family: 'Outfit', sans-serif; transition: background 0.2s;
+    }
+    .btn-clear:hover { background: var(--parchment); }
+
+    .book-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+        gap: 1.5rem;
+    }
+    .book-card {
+        background: var(--card-bg); border: 1px solid var(--border-subtle);
+        border-radius: 16px; overflow: hidden;
+        display: flex; flex-direction: column;
+        transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s;
+    }
+    .book-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 18px 45px var(--spine-shadow);
+        border-color: var(--border-mid);
+    }
+    .book-spine { height: 5px; width: 100%; }
+    .book-top {
+        display: flex; align-items: flex-start;
+        gap: 1rem; padding: 1.4rem 1.4rem 0.9rem;
+    }
+    .book-color-dot {
+        width: 36px; height: 36px;
+        border-radius: 10px; flex-shrink: 0; opacity: 0.85;
+    }
+    .book-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.18rem; font-weight: 600;
+        color: var(--ink); margin: 0 0 0.2rem; line-height: 1.3;
+    }
+    .book-author { font-size: 0.84rem; color: var(--amber-dark); margin: 0; }
+    .book-meta {
+        padding: 0 1.4rem 1.1rem;
+        display: flex; align-items: center; gap: 0.6rem;
+        border-bottom: 1px solid var(--border-subtle);
+    }
+    .page-tag {
+        font-size: 0.78rem; color: #6d5540;
+        background: var(--parchment); border-radius: 8px;
+        padding: 0.28rem 0.65rem;
+    }
+    .thick-tag {
+        font-size: 0.72rem; color: #7a4a10;
+        background: #f5d98a; border-radius: 8px;
+        padding: 0.28rem 0.65rem; font-weight: 600;
+    }
+    .book-footer { padding: 0.9rem 1.1rem; display: flex; gap: 0.5rem; margin-top: auto; }
+    .action-btn {
+        flex: 1; display: inline-flex; align-items: center;
+        justify-content: center; gap: 0.3rem; padding: 0.55rem;
+        border-radius: 10px; font-size: 0.82rem; font-weight: 500;
+        font-family: 'Outfit', sans-serif; text-decoration: none;
+        transition: background 0.18s, color 0.18s;
+    }
+    .btn-edit { background: var(--parchment); color: var(--ink-soft); border: 1px solid var(--border-subtle); }
+    .btn-edit:hover { background: #e0d4ba; color: var(--ink); }
+    .btn-delete { background: #fdecea; color: #a8341f; border: 1px solid rgba(168, 52, 31, 0.15); }
+    .btn-delete:hover { background: #fbd4cf; color: #7d1f10; }
+
+    .empty-state {
+        background: var(--card-bg); border: 1px dashed var(--border-mid);
+        border-radius: 20px; padding: 4rem 2rem;
+        text-align: center; color: var(--amber-dark);
+    }
+    .empty-icon { font-size: 2.8rem; display: block; margin-bottom: 1rem; opacity: 0.45; }
+    .empty-state h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--ink); margin: 0 0 0.5rem; }
+    .empty-state p { font-size: 0.92rem; font-weight: 300; margin: 0 0 1.5rem; }
+
+    .ornament {
+        text-align: center; color: var(--warm-tan);
+        letter-spacing: 0.5em; font-size: 0.7rem;
+        margin: 0 0 2rem; opacity: 0.5; user-select: none;
+    }
+</style>
+
+<div class="lib-page container">
+    @{ var books = Model ?? new List<Bookcase.Models.BooksInfo>(); }
+    @{ var spineColors = new[] { "#5DCAA5", "#378ADD", "#D4537E", "#7F77DD", "#D85A30", "#C89A3A" }; }
+
+    <section class="hero-band">
+        <div class="hero-inner">
+            <div class="hero-eyebrow">Bookcase Library</div>
+            <h1 class="hero-title">Kitap <em>Koleksiyonu</em></h1>
+            <p class="hero-desc">Kütüphanendeki tüm eserleri buradan yönetebilir, düzenleyebilir veya silebilirsin.</p>
+            <div class="stat-row">
+                <div class="stat-pill">
+                    <strong>@books.Count</strong>
+                    <span>Kayıtlı kitap</span>
+                </div>
+                <div class="stat-pill">
+                    <strong>@books.Count(b => b.BookPages > 500)</strong>
+                    <span>Kalın kitap</span>
+                </div>
+                <div class="stat-pill">
+                    <strong>@(books.Count > 0 ? books.Average(b => b.BookPages).ToString("0") : "—")</strong>
+                    <span>Ort. sayfa</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="toolbar">
+        <div class="toolbar-left">
+            <h2>Tüm Kitaplar</h2>
+            <p>Toplam @books.Count adet kayıt listeleniyor</p>
+        </div>
+        <div class="toolbar-right">
+            <form asp-action="Books" method="get">
+                <div class="search-wrap">
+                    <input type="text" name="aramaDizesi"
+                           placeholder="Kitap adı veya yazar..."
+                           value="@Context.Request.Query["aramaDizesi"]" />
+                    <button type="submit">
+                        <i class="bi bi-search"></i> Ara
+                    </button>
+                </div>
+            </form>
+            @if (!string.IsNullOrEmpty(Context.Request.Query["aramaDizesi"]))
+            {
+                <a asp-action="Books" class="btn-clear">Temizle</a>
+            }
+            <a asp-action="Add" class="btn-add">
+                <i class="bi bi-plus-lg"></i> Kitap Ekle
+            </a>
+        </div>
+    </div>
+
+    <div class="ornament">— ✦ —</div>
+
+    @if (books.Any())
+    {
+        <div class="book-grid">
+            @for (var i = 0; i < books.Count; i++)
+            {
+                var kitap = books[i];
+                var renk = spineColors[i % spineColors.Length];
+                <article class="book-card">
+                    <div class="book-spine" style="background: @renk;"></div>
+                    <div class="book-top">
+                        <div class="book-color-dot" style="background: @renk;"></div>
+                        <div>
+                            <h3 class="book-title">@kitap.BookName</h3>
+                            <p class="book-author">@kitap.Author</p>
+                        </div>
+                    </div>
+                    <div class="book-meta">
+                        <span class="page-tag">
+                            <i class="bi bi-journals me-1"></i>@kitap.BookPages sayfa
+                        </span>
+                        @if (kitap.BookPages > 500)
+                        {
+                            <span class="thick-tag">★ Kalın</span>
+                        }
+                    </div>
+                    <div class="book-footer">
+                        <a asp-action="Duzenle" asp-route-id="@kitap.Id" class="action-btn btn-edit">
+                            <i class="bi bi-pencil-square"></i> Düzenle
+                        </a>
+                        <a asp-action="Sil" asp-route-id="@kitap.Id" class="action-btn btn-delete"
+                           onclick="return confirm('@kitap.BookName kitabını silmek istediğinden emin misin?')">
+                            <i class="bi bi-trash"></i> Sil
+                        </a>
+                    </div>
+                </article>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <i class="bi bi-book-half empty-icon"></i>
+            <h3>Henüz kitap eklenmedi</h3>
+            <p>Kütüphanen bomboş görünüyor. Hemen bir tane ekleyerek başla!</p>
+            <a asp-action="Ekle" class="btn-add">
+                <i class="bi bi-plus-lg"></i> Kitap Ekle
+            </a>
+        </div>
+    }
+</div>
