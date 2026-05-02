@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewData["Title"] = "Kitap Ekle";
 }
 @model BooksInfo
@@ -168,6 +168,12 @@
                     <p class="field-hint">500 sayfanın üzerindeyse "Kalın Kitap" rozeti alır.</p>
                     <div class="thick-badge" id="thickBadge">★ Kalın Kitap</div>
                     <span asp-validation-for="BookPages" class="val-error"></span>
+                </div>
+
+                <div class="field">
+                    <label asp-for="Category">Kategori</label>
+                    <input asp-for="Category" id="categoryInput" placeholder="ör. Klasik, Bilim Kurgu, Gizem" autocomplete="off" />
+                    <span asp-validation-for="Category" class="val-error"></span>
                 </div>
 
                 <div class="form-divider"></div>
