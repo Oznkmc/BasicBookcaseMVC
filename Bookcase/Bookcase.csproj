@@ -18,4 +18,11 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Bookcase\Controllers\" />
+    <Folder Include="Bookcase\Data\" />
+    <Folder Include="Bookcase\Migrations\" />
+    <Folder Include="Bookcase\Models\" />
+  </ItemGroup>
+
 </Project>
