@@ -63,16 +63,6 @@
                 <span asp-validation-for="BookPages" class="val-error"></span>
             </div>
 
-            <div class="field">
-    <label asp-for="CategoryId">Kategori</label>
-    <!-- ViewBag.Kategoriler yerine ViewBag.Categories yazdık -->
-    <select asp-for="CategoryId" asp-items="ViewBag.Categories" id="categorySelect" class="form-control">
-        <option value="">Lütfen Bir Kategori Seçin</option>
-    </select>
-    <span asp-validation-for="CategoryId" class="val-error"></span>
-</div>
-
-
             <div class="form-actions">
                 <a asp-action="Books" class="btn-secondary">İptal</a>
                 <button type="submit" class="btn-primary">Değişiklikleri Kaydet</button>

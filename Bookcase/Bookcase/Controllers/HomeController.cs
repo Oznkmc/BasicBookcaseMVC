@@ -3,9 +3,8 @@ using Bookcase.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Metadata.Internal; // ToListAsync gibi işlemler için lazım olabilir
+
 namespace Bookcase.Controllers
 {
     public class HomeController : Controller
@@ -24,49 +23,29 @@ namespace Bookcase.Controllers
             return View();
         }
 
-
-        public IActionResult Books(string aramaDizesi, int? kategoriId)
+        // --- DİKKAT: İki Books metodu TEK bir metotta birleşti ---
+        public IActionResult Books(string aramaDizesi)
         {
-            // 1. MUTLAKA .Include ekle (Eğer bunu unutursan Category null gelir ve hata verir)
-            var kitaplar = _context.Kitaplar
-                .Include(k => k.Category)
-                .AsQueryable();
+            // 1. Sorguyu hazırla
+            var kitaplar = _context.Kitaplar.AsQueryable();
 
-            // 2. Arama Filtresi
+            // 2. Eğer arama kutusu boş değilse filtreyi uygula
             if (!string.IsNullOrEmpty(aramaDizesi))
             {
-                var term = aramaDizesi.Trim().ToLower();
-
-                kitaplar = kitaplar.Where(s =>
-                    s.BookName.ToLower().Contains(term) ||
-                    s.Author.ToLower().Contains(term) ||
-                    // Null check + senin modelindeki isim (CategoryName olduğunu varsayıyorum)
-                    (s.Category != null && s.Category.CategoryName.ToLower().Contains(term))
-                );
+                kitaplar = kitaplar.Where(s => s.BookName.Contains(aramaDizesi) || s.Author.Contains(aramaDizesi));
             }
 
-            // 3. Kategori Butonu Filtresi
-            if (kategoriId.HasValue)
-            {
-                kitaplar = kitaplar.Where(k => k.CategoryId == kategoriId);
-            }
-
-            ViewBag.AllCategories = _context.Kategoriler.ToList();
+            // 3. Tek bir liste olarak döndür
             return View(kitaplar.ToList());
         }
+
         public IActionResult Privacy()
         {
             return View();
         }
 
         [HttpGet]
-        public IActionResult Add()
-        {
-            ViewBag.Categories = new SelectList(_context.Kategoriler.ToList(), "Id", "CategoryName");
-            return View();
-
-        }
-            
+        public IActionResult Add() => View();
         [HttpPost]
         public IActionResult Add(BooksInfo book)
         {
@@ -74,9 +53,11 @@ namespace Bookcase.Controllers
             {
                 string yeniKitapAdi = book.BookName.Trim().ToLower();
                 string yeniYazarAdi = book.Author.Trim().ToLower();
+
                 bool varMi = _context.Kitaplar.Any(k =>
                     k.BookName.Trim().ToLower() == yeniKitapAdi &&
                     k.Author.Trim().ToLower() == yeniYazarAdi);
+
                 if (!varMi)
                 {
                     _context.Kitaplar.Add(book);
@@ -86,13 +67,11 @@ namespace Bookcase.Controllers
                 }
                 else
                 {
-                    
+                    // DİKKAT: Burası "Success" değil "Error" olmalı!
                     TempData["Error"] = $"«{book.BookName}» zaten kitaplıkta mevcut.";
                     ModelState.AddModelError("", "Bu kitap zaten kayıtlı.");
                 }
             }
-
-            ViewBag.Categories =new SelectList( _context.Kategoriler.ToList(),"Id","CategoryName");
             return View(book);
         }
         [HttpGet]
@@ -100,9 +79,7 @@ namespace Bookcase.Controllers
         {
             var kitap = _context.Kitaplar.Find(id);
             if (kitap == null) return NotFound();
-            ViewBag.Categories = new SelectList(_context.Kategoriler.ToList(), "Id", "CategoryName", kitap.CategoryId);
             return View(kitap);
-           
         }
 
         [HttpPost]
@@ -114,7 +91,6 @@ namespace Bookcase.Controllers
                 _context.SaveChanges();
                 return RedirectToAction("Books");
             }
-            ViewBag.Categories = new SelectList(_context.Kategoriler.ToList(), "Id", "CategoryName",book.CategoryId);
             return View(book);
         }
 

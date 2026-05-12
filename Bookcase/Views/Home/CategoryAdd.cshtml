@@ -1,0 +1,193 @@
+﻿@{
+    ViewData["Title"] = "Kategori Yönetimi";
+}
+@model IEnumerable<Category>
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+    .manage-page {
+        font-family: 'Outfit', sans-serif;
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 2rem 1rem 4rem;
+    }
+
+    /* Başlık Alanı */
+    .page-eyebrow {
+        font-size: 0.7rem; font-weight: 600;
+        letter-spacing: 0.2em; text-transform: uppercase;
+        color: var(--warm-tan); margin-bottom: 0.4rem;
+    }
+    .page-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 2.2rem; font-weight: 600;
+        color: var(--ink); line-height: 1.1; margin: 0 0 1.5rem;
+    }
+    .page-title em { font-style: italic; color: var(--gold-accent); }
+
+    /* Form Kartı */
+    .form-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-subtle);
+        border-radius: 20px; overflow: hidden;
+        box-shadow: 0 4px 24px rgba(28, 20, 16, 0.06);
+        margin-bottom: 2.5rem;
+    }
+    .spine-bar { height: 6px; width: 100%; background: var(--gold-accent); transition: background 0.35s; }
+    .form-body { padding: 1.5rem 2rem; }
+    
+    .field-group { display: flex; gap: 1rem; align-items: flex-end; }
+    .field { flex: 1; }
+    .field label {
+        display: block; font-size: 0.78rem; font-weight: 500;
+        letter-spacing: 0.06em; text-transform: uppercase;
+        color: var(--amber-dark); margin-bottom: 0.45rem;
+    }
+    .field input {
+        width: 100%; padding: 0.65rem 0.9rem;
+        font-size: 0.92rem; font-family: 'Outfit', sans-serif;
+        color: var(--ink); background: var(--cream);
+        border: 1px solid var(--border-mid); border-radius: 10px;
+        outline: none; transition: all 0.18s;
+    }
+    .field input:focus { border-color: var(--amber-dark); background: #fdf8f0; }
+
+    /* Kategori Listesi */
+    .category-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .category-item {
+        background: var(--card-bg);
+        border: 1px solid var(--border-subtle);
+        border-radius: 14px;
+        padding: 0.75rem 1.25rem;
+        display: flex; align-items: center;
+        justify-content: space-between;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .category-item:hover { transform: translateX(5px); border-color: var(--gold-accent); }
+    
+    .cat-info { display: flex; align-items: center; gap: 1rem; }
+    .cat-indicator { width: 12px; height: 12px; border-radius: 4px; }
+    .cat-name { 
+        font-family: 'Cormorant Garamond', serif; 
+        font-size: 1.15rem; font-weight: 600; color: var(--ink); 
+    }
+
+    .cat-actions { display: flex; gap: 0.5rem; }
+    .btn-icon {
+        width: 34px; height: 34px; border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        border: 1px solid var(--border-mid); background: white;
+        color: var(--amber-dark); cursor: pointer; transition: all 0.2s;
+        text-decoration: none;
+    }
+    .btn-icon:hover { background: var(--parchment); color: var(--ink); }
+    .btn-icon.delete:hover { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+
+    .btn-save {
+        padding: 0.65rem 1.5rem; font-size: 0.9rem; font-weight: 600;
+        background: var(--gold-accent); color: var(--ink);
+        border: none; border-radius: 10px; cursor: pointer;
+        transition: background 0.2s; height: 42px;
+    }
+    .btn-save:hover { background: #d4a93e; }
+</style>
+
+<div class="manage-page">
+    <div class="page-eyebrow">Ayarlar</div>
+    <h1 class="page-title">Kategori <em>Yönetimi</em></h1>
+
+    <!-- EKLEME / GÜNCELLEME FORMU -->
+    <div class="form-card">
+        <div class="spine-bar" id="formSpine"></div>
+        <div class="form-body">
+            <form asp-action="UpsertCategory" method="post">
+                <input type="hidden" id="CategoryId" name="CategoryId" value="0" />
+                <div class="field-group">
+                    <div class="field">
+                        <label>Kategori Adı</label>
+                        <input type="text" id="CategoryName" name="CategoryName" required 
+                               placeholder="ör. Dünya Klasikleri" autocomplete="off" />
+                    </div>
+                    <button type="submit" class="btn-save" id="submitBtn">
+                        <i class="bi bi-plus-lg"></i> Kaydet
+                    </button>
+                    <button type="button" class="btn-icon" id="cancelEdit" style="display:none;" onclick="resetForm()">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- LİSTELEME ALANI -->
+    <div class="page-eyebrow" style="margin-bottom: 1rem;">Mevcut Kategoriler</div>
+    <div class="category-list">
+        @foreach (var item in Model)
+        {
+            <div class="category-item">
+                <div class="cat-info">
+                    <div class="cat-indicator" style="background-color: var(--gold-accent);" data-name="@item.CategoryName"></div>
+                    <span class="cat-name">@item.CategoryName</span>
+                </div>
+                <div class="cat-actions">
+                    <a href="javascript:void(0)" onclick="editCategory(@item.Id, '@item.CategoryName')" class="btn-icon" title="Düzenle">
+                        <i class="bi bi-pencil-square"></i>
+                    </a>
+                    <form asp-action="DeleteCategory" asp-route-id="@item.Id" method="post" onsubmit="return confirm('Bu kategoriyi silmek istediğinize emin misiniz?')">
+                        <button type="submit" class="btn-icon delete" title="Sil">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const colors = ["#5DCAA5", "#378ADD", "#D4537E", "#7F77DD", "#D85A30", "#C89A3A"];
+        
+        function getColor(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = str.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            return colors[Math.abs(hash) % colors.length];
+        }
+
+        // Renk göstergelerini isimlere göre boya
+        document.querySelectorAll('.cat-indicator').forEach(el => {
+            el.style.backgroundColor = getColor(el.dataset.name);
+        });
+
+        const nameInput = document.getElementById('CategoryName');
+        const formSpine = document.getElementById('formSpine');
+        const idInput = document.getElementById('CategoryId');
+        const submitBtn = document.getElementById('submitBtn');
+        const cancelBtn = document.getElementById('cancelEdit');
+
+        nameInput.addEventListener('input', () => {
+            formSpine.style.background = nameInput.value ? getColor(nameInput.value) : 'var(--gold-accent)';
+        });
+
+        function editCategory(id, name) {
+            idInput.value = id;
+            nameInput.value = name;
+            submitBtn.innerHTML = '<i class="bi bi-check-lg"></i> Güncelle';
+            cancelBtn.style.display = 'flex';
+            formSpine.style.background = getColor(name);
+            nameInput.focus();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetForm() {
+            idInput.value = "0";
+            nameInput.value = "";
+            submitBtn.innerHTML = '<i class="bi bi-plus-lg"></i> Kaydet';
+            cancelBtn.style.display = 'none';
+            formSpine.style.background = 'var(--gold-accent)';
+        }
+    </script>
+}

@@ -91,7 +91,7 @@
     .toolbar {
         display: flex; align-items: center;
         justify-content: space-between;
-        gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem;
+        gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem;
     }
     .toolbar-left h2 {
         font-family: 'Cormorant Garamond', serif;
@@ -145,43 +145,6 @@
     }
     .btn-clear:hover { background: var(--parchment); }
 
-    /* KATEGORİ BARI */
-    .cat-bar-section { margin-bottom: 1.5rem; }
-    .cat-bar-label {
-        font-size: 0.72rem; font-weight: 600;
-        letter-spacing: 0.16em; text-transform: uppercase;
-        color: var(--amber-dark); margin-bottom: 0.6rem;
-    }
-    .cat-bar {
-        display: flex; align-items: center;
-        gap: 0.5rem; flex-wrap: wrap;
-        background: var(--card-bg);
-        border: 1px solid var(--border-subtle);
-        border-radius: 16px; padding: 0.65rem 1rem;
-    }
-    .cat-pill {
-        display: inline-flex; align-items: center; gap: 0.35rem;
-        padding: 0.38rem 0.9rem; border-radius: 99px;
-        font-size: 0.82rem; font-weight: 500;
-        cursor: pointer; border: 1px solid var(--border-mid);
-        background: transparent; color: var(--amber-dark);
-        transition: all 0.18s; text-decoration: none;
-        font-family: 'Outfit', sans-serif;
-    }
-    .cat-pill:hover {
-        background: var(--parchment); color: var(--ink);
-        border-color: var(--amber-dark);
-    }
-    .cat-pill.active {
-        background: var(--leather); color: var(--parchment);
-        border-color: var(--leather);
-    }
-    .cat-divider {
-        width: 1px; height: 22px;
-        background: var(--border-mid);
-        margin: 0 0.25rem; flex-shrink: 0;
-    }
-
     .book-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
@@ -213,11 +176,11 @@
         color: var(--ink); margin: 0 0 0.2rem; line-height: 1.3;
     }
     .book-author { font-size: 0.84rem; color: var(--amber-dark); margin: 0; }
-
+    
     .book-meta {
         padding: 0 1.4rem 1.1rem;
-        display: flex; align-items: center;
-        flex-wrap: wrap;
+        display: flex; align-items: center; 
+        flex-wrap: wrap; /* Çoklu etiketlerde alt satıra geçmesi için eklendi */
         gap: 0.6rem;
         border-bottom: 1px solid var(--border-subtle);
     }
@@ -231,10 +194,12 @@
         background: #f5d98a; border-radius: 8px;
         padding: 0.28rem 0.65rem; font-weight: 600; white-space: nowrap;
     }
+    
+    /* YENİ KATEGORİ ETİKETİ STİLİ */
     .category-tag {
-        font-size: 0.75rem;
+        font-size: 0.75rem; 
         color: var(--leather);
-        background: rgba(139, 100, 48, 0.08);
+        background: rgba(139, 100, 48, 0.08); /* Hafif amber arka plan */
         border: 1px solid rgba(139, 100, 48, 0.15);
         border-radius: 8px;
         padding: 0.28rem 0.65rem;
@@ -269,8 +234,6 @@
         letter-spacing: 0.5em; font-size: 0.7rem;
         margin: 0 0 2rem; opacity: 0.5; user-select: none;
     }
-
-    .book-card[data-hidden="true"] { display: none; }
 </style>
 
 <div class="lib-page container">
@@ -325,39 +288,16 @@
         </div>
     </div>
 
-    <!-- KATEGORİ BARI -->
-    <div class="cat-bar-section">
-        <div class="cat-bar-label">Kategoriler</div>
-        <div class="cat-bar">
-            <button class="cat-pill active" data-cat="tumu" onclick="filterCat(this, 'tumu')">
-                Tümü
-            </button>
-            <div class="cat-divider"></div>
-            <!-- Buraya kendi kategorilerini ekle -->
-            @foreach(var c in ViewBag.AllCategories)
-            {
-                 <button class="cat-pill" data-cat="@c.CategoryName" onclick="filterCat(this, '@c.CategoryName')">
-                <i class="bi bi-book me-1">@c.CategoryName</i> 
-            </button>
-            }
-           
-           
-
-            
-        </div>
-    </div>
-
     <div class="ornament">— ✦ —</div>
 
     @if (books.Any())
     {
-        <div asp-item:"book", asp-for:"books" class="book-grid" id="bookGrid">
+        <div class="book-grid">
             @for (var i = 0; i < books.Count; i++)
             {
                 var kitap = books[i];
                 var renk = spineColors[i % spineColors.Length];
-                var catName = kitap.Category?.CategoryName ?? "Kategorisiz";
-                <article class="book-card" data-category="@catName">
+                <article class="book-card">
                     <div class="book-spine" style="background: @renk;"></div>
                     <div class="book-top">
                         <div class="book-color-dot" style="background: @renk;"></div>
@@ -370,10 +310,12 @@
                         <span class="page-tag">
                             <i class="bi bi-journals me-1"></i>@kitap.BookPages sayfa
                         </span>
+                        
+                        <!-- YENİ EKLENEN KATEGORİ ALANI -->
                         <span class="category-tag">
-                            <i class="bi bi-tag-fill me-1"></i>
-                            @catName
+                            <i class="bi bi-tag-fill me-1"></i>@(kitap.Category ?? "Kategorisiz")
                         </span>
+
                         @if (kitap.BookPages > 500)
                         {
                             <span class="thick-tag">★ Kalın</span>
@@ -404,18 +346,3 @@
         </div>
     }
 </div>
-
-<script>
-    function filterCat(btn, cat) {
-        document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
-        btn.classList.add('active');
-
-        document.querySelectorAll('#bookGrid .book-card').forEach(card => {
-            if (cat === 'tumu' || card.dataset.category === cat) {
-                card.style.display = '';
-            } else {
-                card.style.display = 'none';
-            }
-        });
-    }
-</script>

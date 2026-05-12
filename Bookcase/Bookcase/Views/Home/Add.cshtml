@@ -6,7 +6,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
 <style>
-    
+    /* CSS kodların aynen kalıyor (Toast CSS'lerini sildim) */
     .add-page {
         font-family: 'Outfit', sans-serif;
         max-width: 540px;
@@ -170,15 +170,11 @@
                     <span asp-validation-for="BookPages" class="val-error"></span>
                 </div>
 
-              <!-- KATEGORİ ALANI -->
-<div class="field">
-    <label asp-for="CategoryId">Kategori</label>
-    <!-- ViewBag.Kategoriler yerine ViewBag.Categories yazdık -->
-    <select asp-for="CategoryId" asp-items="ViewBag.Categories" id="categorySelect" class="form-control">
-        <option value="">Lütfen Bir Kategori Seçin</option>
-    </select>
-    <span asp-validation-for="CategoryId" class="val-error"></span>
-</div>
+                <div class="field">
+                    <label asp-for="Category">Kategori</label>
+                    <input asp-for="Category" id="categoryInput" placeholder="ör. Klasik, Bilim Kurgu, Gizem" autocomplete="off" />
+                    <span asp-validation-for="Category" class="val-error"></span>
+                </div>
 
                 <div class="form-divider"></div>
 
@@ -208,7 +204,7 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
-        
+        // ── Sadece Form Önizleme (Preview) Scriptleri Kaldı ─────────────────
         const colors      = ["#5DCAA5","#378ADD","#D4537E","#7F77DD","#D85A30","#C89A3A"];
         const nameInput   = document.getElementById('bookNameInput');
         const authorInput = document.getElementById('authorInput');

@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Bookcase.Models
 {
@@ -17,9 +16,7 @@ namespace Bookcase.Models
         [Range(10, 2000, ErrorMessage = "Sayfa sayısı  10 ile 2000 arasında olmalı")]
         public int BookPages { get; set; }
 
-        public int CategoryId { get; set; }
-
-        [ForeignKey("CategoryId")]
-        public Category? Category { get; set; }
+        [StringLength(50, ErrorMessage = "Kategori 50 karakterden uzun olamaz")]
+        public String Category { get; set; }
     }
 }

@@ -1,0 +1,209 @@
+﻿@{
+    ViewData["Title"] = "Bookcase";
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+    :root {
+        --cream: #F5EFE0;
+        --parchment: #EDE3CF;
+        --warm-tan: #C8AA7E;
+        --amber-dark: #8B6430;
+        --leather: #5C3D1E;
+        --ink: #1C1410;
+        --card-bg: #FDFAF4;
+        --border-subtle: rgba(139, 100, 48, 0.15);
+        --border-mid: rgba(139, 100, 48, 0.28);
+        --gold-accent: #C89A3A;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    .home-page {
+        font-family: 'Outfit', sans-serif;
+        background: var(--cream);
+        min-height: 100vh;
+        padding: 2rem 0 4rem;
+    }
+
+    /* ── HERO ── */
+    .hero-band {
+        background: var(--leather);
+        border-radius: 20px;
+        padding: 3.5rem 3.5rem 3rem;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+    .hero-band::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+            repeating-linear-gradient(90deg, transparent 0px, transparent 48px, rgba(255,255,255,0.025) 48px, rgba(255,255,255,0.025) 50px),
+            repeating-linear-gradient(0deg,  transparent 0px, transparent 48px, rgba(255,255,255,0.025) 48px, rgba(255,255,255,0.025) 50px);
+        pointer-events: none;
+    }
+    .hero-band::after {
+        content: '';
+        position: absolute;
+        right: -70px; bottom: -70px;
+        width: 320px; height: 320px;
+        border-radius: 50%;
+        border: 48px solid rgba(200, 154, 58, 0.1);
+        pointer-events: none;
+    }
+    .hero-inner { position: relative; z-index: 1; }
+
+    .hero-eyebrow {
+        font-size: 0.7rem; font-weight: 600;
+        letter-spacing: 0.22em; text-transform: uppercase;
+        color: var(--warm-tan); margin-bottom: 0.75rem;
+    }
+    .hero-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: clamp(2.4rem, 5vw, 4.2rem);
+        font-weight: 600; color: var(--parchment);
+        line-height: 1.05; margin: 0 0 1rem;
+    }
+    .hero-title em { font-style: italic; color: var(--gold-accent); }
+    .hero-lead {
+        color: rgba(237, 227, 207, 0.72);
+        font-size: 0.97rem; font-weight: 300;
+        max-width: 46rem; line-height: 1.7; margin-bottom: 2rem;
+    }
+
+    .hero-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 2.25rem; }
+    .btn-primary-warm {
+        display: inline-flex; align-items: center; gap: 0.4rem;
+        background: var(--gold-accent); color: var(--ink);
+        border: none; border-radius: 12px; padding: 0.65rem 1.5rem;
+        font-family: 'Outfit', sans-serif; font-size: 0.9rem; font-weight: 600;
+        text-decoration: none; transition: background 0.2s, transform 0.15s;
+    }
+    .btn-primary-warm:hover { background: #d4a93e; transform: translateY(-1px); color: var(--ink); }
+    .btn-outline-warm {
+        display: inline-flex; align-items: center; gap: 0.4rem;
+        background: transparent; color: var(--parchment);
+        border: 1px solid rgba(200, 154, 58, 0.4); border-radius: 12px;
+        padding: 0.65rem 1.5rem;
+        font-family: 'Outfit', sans-serif; font-size: 0.9rem; font-weight: 400;
+        text-decoration: none; transition: background 0.2s, border-color 0.2s;
+    }
+    .btn-outline-warm:hover { background: rgba(200, 154, 58, 0.12); border-color: var(--gold-accent); color: var(--parchment); }
+
+    .stat-row { display: flex; gap: 0.875rem; flex-wrap: wrap; }
+    .stat-pill {
+        background: rgba(255,255,255,0.07);
+        border: 1px solid rgba(200, 154, 58, 0.28);
+        border-radius: 12px; padding: 0.8rem 1.4rem; min-width: 130px;
+    }
+    .stat-pill strong {
+        display: block;
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.6rem; font-weight: 700;
+        color: var(--gold-accent); line-height: 1;
+    }
+    .stat-pill span { font-size: 0.78rem; color: rgba(237, 227, 207, 0.62); font-weight: 300; }
+
+    /* ── FEATURE CARDS ── */
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        gap: 1.25rem;
+        margin-top: 1.5rem;
+    }
+    .feature-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-subtle);
+        border-radius: 16px;
+        padding: 1.6rem 1.5rem;
+        transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    }
+    .feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(28, 20, 16, 0.1);
+        border-color: var(--border-mid);
+    }
+    .feature-icon {
+        width: 42px; height: 42px;
+        border-radius: 11px;
+        background: var(--parchment);
+        display: flex; align-items: center; justify-content: center;
+        margin-bottom: 1.1rem;
+        color: var(--leather);
+        font-size: 1.2rem;
+    }
+    .feature-card h3 {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.2rem; font-weight: 600;
+        color: var(--ink); margin: 0 0 0.4rem;
+    }
+    .feature-card p {
+        font-size: 0.86rem; color: var(--amber-dark);
+        font-weight: 300; line-height: 1.6; margin: 0;
+    }
+
+    .ornament {
+        text-align: center; color: var(--warm-tan);
+        letter-spacing: 0.5em; font-size: 0.7rem;
+        margin: 1.75rem 0; opacity: 0.5; user-select: none;
+    }
+</style>
+
+<div class="home-page container">
+
+    <section class="hero-band">
+        <div class="hero-inner">
+            <div class="hero-eyebrow">Bookcase</div>
+            <h1 class="hero-title">Kitaplığa <em>hoş geldiniz.</em></h1>
+            <p class="hero-lead">Koleksiyonunu düzenle, yeni kitaplar ekle ve tüm kitaplarını sadece kitaplık sayfasında görüntüle.</p>
+
+            <div class="hero-actions">
+                <a asp-action="Books" class="btn-primary-warm">
+                    <i class="bi bi-book"></i> Kitaplığa git
+                </a>
+                <a asp-action="Add" class="btn-outline-warm">
+                    <i class="bi bi-plus-lg"></i> Yeni kitap ekle
+                </a>
+            </div>
+
+            <div class="stat-row">
+                <div class="stat-pill">
+                    <strong>@ViewBag.BookCount</strong>
+                    <span>Toplam kitap</span>
+                </div>
+                <div class="stat-pill">
+                    <strong>@ViewBag.ThickBookCount</strong>
+                    <span>Kalın kitap</span>
+                </div>
+                <div class="stat-pill">
+                    <strong>Hazır</strong>
+                    <span>Okuma listesi</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="ornament">— ✦ —</div>
+
+    <div class="feature-grid">
+        <div class="feature-card">
+            <div class="feature-icon"><i class="bi bi-book"></i></div>
+            <h3>Kitaplık görünümü</h3>
+            <p>Tüm kitaplar ayrı bir sayfada kartlar halinde listelenir.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="bi bi-plus-circle"></i></div>
+            <h3>Hızlı ekleme</h3>
+            <p>Yeni kitapları kolayca ekleyip kitaplığa geri dönebilirsin.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="bi bi-stars"></i></div>
+            <h3>Temiz tasarım</h3>
+            <p>Kitap odaklı, sade ve modern bir arayüz kullanılır.</p>
+        </div>
+    </div>
+
+</div>

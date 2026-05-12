@@ -171,10 +171,6 @@
                         <li class="nav-item">
                             <a class="nav-link-item" asp-controller="Home" asp-action="Books">Kitaplık</a>
                         </li>
-                        <!-- EKLEDİĞİMİZ KATEGORİ LİNKİ -->
-                        <li class="nav-item">
-                            <a class="nav-link-item" asp-controller="Category" asp-action="Index">Kategoriler</a>
-                        </li>
                     </ul>
                     <ul class="navbar-nav mt-2 mt-sm-0">
                         <li class="nav-item">
@@ -204,17 +200,84 @@
         </div>
     </footer>
 
-    <!-- Toast Yapısı ve Scriptler Aynen Kalıyor... -->
+    <!-- Toast -->
     <div class="toast-wrap" id="successToast" role="alert" aria-live="polite">
-        <!-- Toast içeriği -->
+        <div class="toast-box">
+            <div class="toast-icon" id="toastIcon">✓</div>
+            <div class="toast-texts">
+                <div class="toast-title" id="toastTitle">İşlem Başarılı!</div>
+                <div id="toastBody" class="toast-body">Koleksiyonuna başarıyla eklendi.</div>
+            </div>
+            <button class="toast-close" onclick="hideToast()" aria-label="Kapat">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            <div class="toast-progress" id="toastProgress"></div>
+        </div>
     </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    
+
     <script>
-        // Mevcut scroll ve toast scriptlerin...
+        const nav = document.querySelector('.site-nav');
+        window.addEventListener('scroll', () => {
+            nav.classList.toggle('scrolled', window.scrollY > 10);
+        });
+
+        let toastTimer;
+        function showToast(message, type = 'success') {
+            const wrap  = document.getElementById('successToast');
+            const body  = document.getElementById('toastBody');
+            const prog  = document.getElementById('toastProgress');
+            const title = document.getElementById('toastTitle');
+            const icon  = document.getElementById('toastIcon');
+
+            if (message) body.textContent = message;
+
+            wrap.classList.remove('error');
+            if (type === 'error') {
+                wrap.classList.add('error');
+                title.textContent = 'Zaten Mevcut!';
+                icon.textContent  = '✕';
+            } else {
+                title.textContent = 'İşlem Başarılı!';
+                icon.textContent  = '✓';
+            }
+
+            wrap.classList.remove('hide');
+            wrap.classList.add('show');
+
+            prog.style.animation = 'none';
+            void prog.offsetWidth;
+            prog.style.animation = 'toastShrink 4s linear forwards';
+
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(hideToast, 4000);
+        }
+
+        function hideToast() {
+            const wrap = document.getElementById('successToast');
+            wrap.classList.add('hide');
+            setTimeout(() => wrap.classList.remove('show', 'hide'), 420);
+        }
+
+        @if (TempData["Success"] != null)
+        {
+            <text>
+            document.addEventListener('DOMContentLoaded', function () {
+                showToast("@JavaScriptEncoder.Default.Encode(TempData["Success"].ToString())");
+            });
+            </text>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <text>
+            document.addEventListener('DOMContentLoaded', function () {
+                showToast("@JavaScriptEncoder.Default.Encode(TempData["Error"].ToString())", 'error');
+            });
+            </text>
+        }
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)

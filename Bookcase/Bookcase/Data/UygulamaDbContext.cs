@@ -11,6 +11,5 @@ namespace Bookcase.Data
         }
         // Bu satır: "SQL'de Kitaplar adında bir tablo oluştur" demektir.
         public DbSet<BooksInfo> Kitaplar { get; set; }
-        public DbSet<Category> Kategoriler { get; set; }
     }
 }
